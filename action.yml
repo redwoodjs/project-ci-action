@@ -9,7 +9,7 @@ runs:
     - name: Check
       run: yarn rw check
       shell: bash
-    - name: Test
+    - name: Run tests
       run: yarn rw test
       shell: bash
     - name: Build

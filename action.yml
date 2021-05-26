@@ -3,7 +3,6 @@ description: RedwoodJS CI—lint, check, run tests, and build
 runs:
   using: "composite"
   steps:
-    # lint, run tests, and build
     - name: Lint
       run: yarn rw lint
       shell: bash

@@ -1,0 +1,82 @@
+name: 'Redwood Build, Lint, Diagnostics, and Tests'
+description: 'Run CI on a Redwood Project'
+inputs:
+  run-lint:
+    description: "run project lint ('yes' or 'no' as string)"
+    required: false
+    default: 'yes'
+  project-directory:
+    description: "path to project directory" 
+    required: true
+    default: './'
+  yarn3-cache:
+    description: "enable Yarn 3 caching ('yes' or 'no' as string)" 
+    required: true
+    default: 'yes'    
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js v16
+      uses: actions/setup-node@v3
+      with:
+        node-version: "16"
+
+    - name: Set up Postgres
+      uses: CasperWA/postgresql-action@v1
+      with:
+        postgresql version: '14'
+        postgresql db: 'test'
+        postgresql user: test
+        postgresql password: password
+
+    - name: Get yarn cache directory path
+      if: ${{ inputs.yarn3-cache == 'yes' }}
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      shell: bash
+
+    - name: Cache yarn
+      if: ${{ inputs.yarn3-cache == 'yes' }}
+      uses: actions/cache@v3
+      id: yarn-cache
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: yarn-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          yarn-    
+
+- name: Set project directory
+      id: project-directory
+      run: echo "::set-output name=dir::${{ inputs.project-directory }}"
+      shell: bash
+    
+    - name: Install dependencies
+      working-directory: ${{ steps.project-directory.outputs.dir }}
+      run: yarn install --immutable
+      shell: bash
+      
+    - name: Run Build
+      working-directory: ${{ steps.project-directory.outputs.dir }}
+      run: yarn rw build
+      shell: bash
+
+    - name: Run Lint
+      if: ${{ inputs.run-lint == 'yes' }}
+      working-directory: ${{ steps.project-directory.outputs.dir }}
+      run: yarn rw lint
+      shell: bash
+
+    - name: Run Diagnostics
+      working-directory: ${{ steps.project-directory.outputs.dir }}
+      run: yarn rw check
+      shell: bash
+      
+    - name: Run Tests
+      working-directory: ${{ steps.project-directory.outputs.dir }}
+      run: yarn rw test
+      env:
+        TEST_DATABASE_URL: postgresql://test:password@localhost:5432/test
+      shell: bash

@@ -48,7 +48,7 @@ runs:
         restore-keys: |
           yarn-    
 
-- name: Set project directory
+    - name: Set project directory
       id: project-directory
       run: echo "::set-output name=dir::${{ inputs.project-directory }}"
       shell: bash

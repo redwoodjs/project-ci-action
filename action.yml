@@ -58,9 +58,18 @@ runs:
       run: yarn install --immutable
       shell: bash
       
+    - name: Run migrate
+      working-directory: ${{ steps.project-directory.outputs.dir }}
+      run: yarn rw prisma migrate dev
+      env:
+        DATABASE_URL: postgresql://test:password@localhost:5432/test
+      shell: bash
+      
     - name: Run Build
       working-directory: ${{ steps.project-directory.outputs.dir }}
       run: yarn rw build
+      env:
+        DATABASE_URL: postgresql://test:password@localhost:5432/test
       shell: bash
 
     - name: Run Lint

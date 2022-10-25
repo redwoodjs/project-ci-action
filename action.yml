@@ -35,7 +35,7 @@ runs:
     - name: Get yarn cache directory path
       if: ${{ inputs.yarn3-cache == 'yes' }}
       id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Cache yarn
@@ -50,7 +50,7 @@ runs:
 
     - name: Set project directory
       id: project-directory
-      run: echo "::set-output name=dir::${{ inputs.project-directory }}"
+      run: echo "dir=${{ inputs.project-directory }}" >> $GITHUB_OUTPUT
       shell: bash
     
     - name: Install dependencies

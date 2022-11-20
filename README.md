@@ -8,7 +8,7 @@ The following tests and perform quality assurances on your project when a pull r
 
 ```YAML
 # .github/workflows/qa.yaml
-name: CI — Quality Assurance
+name: Quality Assurance
 
 on:
   pull_request:

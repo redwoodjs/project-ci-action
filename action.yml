@@ -37,6 +37,7 @@ runs:
       id: yarn-cache-dir-path
       run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
       shell: bash
+      working-directory: ${{ inputs.project-directory }}
 
     - name: 📁 Cache yarn
       if: ${{ inputs.yarn3-cache == 'yes' }}

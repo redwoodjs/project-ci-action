@@ -15,15 +15,6 @@ inputs:
     description: Run project lint ('yes' or 'no' as string)
     default: 'yes'
 
-defaults:
-  run:
-    shell: bash
-    working-directory: ${{ inputs.project-directory }}
-
-env:
-  DATABASE_URL: postgresql://test:password@localhost:5432/test
-  TEST_DATABASE_URL: postgresql://test:password@localhost:5432/test
-
 runs:
   using: composite
   steps:
@@ -45,6 +36,7 @@ runs:
       if: ${{ inputs.yarn3-cache == 'yes' }}
       id: yarn-cache-dir-path
       run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      shell: bash
 
     - name: 📁 Cache yarn
       if: ${{ inputs.yarn3-cache == 'yes' }}
@@ -57,20 +49,35 @@ runs:
     
     - name: 🧶 Yarn install
       run: yarn install --immutable
-      
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
+
     - name: ◭ Run migrate
       run: yarn rw prisma migrate dev
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
+      env:
+        DATABASE_URL: postgresql://test:password@localhost:5432/test
       
     - name: 🏗️ Run build
       run: yarn rw build
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
 
     - name: 🔎 Run lint
       if: ${{ inputs.run-lint == 'yes' }}
       run: yarn rw lint
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
 
     - name: 🔬 Run diagnostics
       run: yarn rw check
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
       
     - name: 🧪 Run tests
       run: yarn rw test
-      
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
+      env:
+        TEST_DATABASE_URL: postgresql://test:password@localhost:5432/test

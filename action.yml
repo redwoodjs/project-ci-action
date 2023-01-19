@@ -63,6 +63,8 @@ runs:
       run: yarn rw build
       shell: bash
       working-directory: ${{ inputs.project-directory }}
+      env:
+        DATABASE_URL: postgresql://test:password@localhost:5432/test
 
     - name: 🔎 Run lint
       if: ${{ inputs.run-lint == 'yes' }}

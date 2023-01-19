@@ -79,7 +79,9 @@ runs:
       working-directory: ${{ inputs.project-directory }}
       
     - name: 🧪 Run tests
-      run: yarn rw test
+      run: |
+        yarn rw test api --no-watch
+        yarn rw test web --no-watch
       shell: bash
       working-directory: ${{ inputs.project-directory }}
       env:

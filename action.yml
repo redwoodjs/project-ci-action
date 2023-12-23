@@ -5,15 +5,12 @@ inputs:
   node-version:
     description: The Node Version
     default: 18
-
   project-directory:
     description: Path to project directory
     required: true
-
   yarn3-cache:
     description: Enable Yarn 3 caching ('yes' or 'no' as string) 
     default: 'yes'    
-
   run-lint:
     description: Run project lint ('yes' or 'no' as string)
     default: 'yes'

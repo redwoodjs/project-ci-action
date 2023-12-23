@@ -3,17 +3,25 @@ description: Run CI on a Redwood Project
 
 inputs:
   node-version:
-    description: The Node Version
+    description: Node.js Version. Default is `18`.
     default: 18
+
   project-directory:
-    description: Path to project directory
-    required: true
-  yarn3-cache:
-    description: Enable Yarn 3 caching ('yes' or 'no' as string) 
-    default: 'yes'    
+    description: Path to project directory. Default is '.'.
+    default: '.'
+
+  yarn-cache:
+    description: Enable Yarn caching. Default is `true`.
+    default: true
+
   run-lint:
-    description: Run project lint ('yes' or 'no' as string)
-    default: 'yes'
+    description: Run lint. Default is `true`.
+    default: true
+
+  github-token:
+    description: GITHUB_TOKEN
+    default: '${{ github.token }}'
+
 
 runs:
   using: composite
@@ -38,26 +46,27 @@ runs:
         postgresql user: test
         postgresql password: password
 
-    - name: 📁 Get yarn cache directory path
-      if: ${{ inputs.yarn3-cache == 'yes' }}
-      id: yarn-cache-dir-path
-      run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+    - name: 📁 Get yarn cache directory
+      if: ${{ inputs.yarn-cache == 'true' }}
+      id: get-yarn-cache-directory
+      run: echo "CACHE_DIRECTORY=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
       shell: bash
       working-directory: ${{ inputs.project-directory }}
 
-    - name: 📁 Cache yarn
-      if: ${{ inputs.yarn3-cache == 'yes' }}
-      uses: actions/cache@v3    
+    - name: ♻️ Restore yarn cache
+      if: ${{ inputs.yarn-cache == 'true' }}
+      uses: actions/cache@v3
       with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+        path: ${{ steps.get-yarn-cache-directory.outputs.CACHE_DIRECTORY }}
+        key: yarn-cache-${{ runner.os }}-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
+        restore-keys: yarn-cache-${{ runner.os }}
     
     - name: 🐈 Yarn install
       run: yarn install --inline-builds
       shell: bash
       working-directory: ${{ inputs.project-directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
 
     - name: ◭ Run migrate
       run: yarn rw prisma migrate dev
@@ -74,7 +83,7 @@ runs:
         DATABASE_URL: postgresql://test:password@localhost:5432/test
 
     - name: 🔎 Run lint
-      if: ${{ inputs.run-lint == 'yes' }}
+      if: ${{ inputs.run-lint == 'true' }}
       run: yarn rw lint
       shell: bash
       working-directory: ${{ inputs.project-directory }}

@@ -20,6 +20,8 @@ runs:
   steps:
     - uses: actions/checkout@v3
 
+    - run: corepack enable
+
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}

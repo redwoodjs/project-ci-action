@@ -3,8 +3,8 @@ description: Run CI on a Redwood Project
 
 inputs:
   node-version:
-    description: Node.js Version. Default is `18`.
-    default: 18
+    description: Node.js Version. Default is `20`.
+    default: 20
 
   project-directory:
     description: Path to project directory. Default is '.'.

@@ -55,7 +55,7 @@ runs:
 
     - name: ♻️ Restore yarn cache
       if: ${{ inputs.yarn-cache == 'true' }}
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ steps.get-yarn-cache-directory.outputs.CACHE_DIRECTORY }}
         key: yarn-cache-${{ runner.os }}-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
